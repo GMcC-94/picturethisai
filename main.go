@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"picturethisai/handler"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
@@ -17,7 +18,7 @@ func main() {
 
 	router := chi.NewMux()
 
-	//router.Get("/")
+	router.Get("/", handler.MakeHandler(handler.HandleHomeIndex))
 
 	port := os.Getenv("HTTP_LISTEN_ADDR")
 	slog.Info("application running", "port", port)
