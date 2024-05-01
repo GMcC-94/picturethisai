@@ -11,9 +11,9 @@ install:
 	@npm install -D daisyui@latest
 
 build:
-	## tailwindcss -i view/css/input.css -o public/styles.css
+	npx tailwindcss -i view/css/app.css -o public/styles.css
 	@templ generate view
-	@go build -o bin/picturethisai
+	@go build -o bin/picturethisai main.go
 
 up: ## DB migrate up
 	@go run cmd/migrate/main.go up
