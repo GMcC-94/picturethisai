@@ -4,6 +4,8 @@ import (
 	"log/slog"
 	"net/http"
 	"picturethisai/types"
+
+	"github.com/a-h/templ"
 )
 
 func getAuthenticatedUser(r *http.Request) types.AuthenticatedUser {
@@ -20,4 +22,8 @@ func Make(h func(http.ResponseWriter, *http.Request) error) http.HandlerFunc {
 			slog.Error("internal server error", "err", err, "path", r.URL.Path)
 		}
 	}
+}
+
+func render(r *http.Request, w http.ResponseWriter, component templ.Component) error {
+	return component.Render(r.Context(), w)
 }
