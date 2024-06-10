@@ -18,8 +18,8 @@ func TestBarBar(t *testing.T) {
 		Email     string
 	}{
 		FirstName: "",
-		LastName:  "GG",
-		Email:     "cryptoanthdm@gmail.com",
+		LastName:  "GMC",
+		Email:     "gmcc94@gmail.com",
 	}
 
 	var errs CustomError
@@ -97,7 +97,7 @@ func TestUrl(t *testing.T) {
 func TestEmail(t *testing.T) {
 	data := struct {
 		Email string
-	}{Email: "agg.com"}
+	}{Email: "agmc.com"}
 	t.Run("invalid", func(t *testing.T) {
 		errs := map[string]string{}
 		ok := New(data, Fields{
@@ -108,7 +108,7 @@ func TestEmail(t *testing.T) {
 	})
 	t.Run("valid", func(t *testing.T) {
 		errs := map[string]string{}
-		data.Email = "a@gg.com"
+		data.Email = "a@gmc.com"
 		ok := New(data, Fields{
 			"Email": Rules(Email),
 		}).Validate(errs)
