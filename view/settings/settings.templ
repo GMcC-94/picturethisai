@@ -1,0 +1,10 @@
+package settings
+
+import "picturethisai/view/layout"
+import "picturethisai/types"
+
+templ Index(user types.AuthenticatedUser) {
+	@layout.App(true) {
+		<div>settings { user.Email }</div>
+	}
+}
