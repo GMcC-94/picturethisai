@@ -76,8 +76,7 @@ func HandleLoginCreate(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	setAuthCookie(w, resp.AccessToken)
-	http.Redirect(w, r, "/", http.StatusSeeOther)
-	return nil
+	return hxRedirect(w, r, "/")
 
 }
 
