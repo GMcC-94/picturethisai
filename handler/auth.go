@@ -12,6 +12,11 @@ import (
 	"github.com/nedpals/supabase-go"
 )
 
+const (
+	sessionUserKey        = "user"
+	sessionAccessTokenKey = "accessToken"
+)
+
 func HandleLoginIndex(w http.ResponseWriter, r *http.Request) error {
 	return render(r, w, auth.Login())
 }
@@ -53,7 +58,7 @@ func HandleSignupCreate(w http.ResponseWriter, r *http.Request) error {
 func HandleLoginWithGoogle(w http.ResponseWriter, r *http.Request) error {
 	resp, err := sb.Client.Auth.SignInWithProvider(supabase.ProviderSignInOptions{
 		Provider:   "google",
-		RedirectTo: "http://localhost:3000/auth/callback",
+		RedirectTo: os.Getenv("REDIRECT"),
 	})
 	if err != nil {
 		return err
@@ -68,18 +73,6 @@ func HandleLoginCreate(w http.ResponseWriter, r *http.Request) error {
 		Email:    r.FormValue("email"),
 		Password: r.FormValue("password"),
 	}
-
-	// if !util.IsValidEmail(credentials.Email) {
-	// 	return render(r, w, auth.LoginForm(credentials, auth.LoginErrors{
-	// 		Email: "PLease enter a valid email",
-	// 	}))
-	// }
-
-	// if reason, ok := util.ValidatePassword(credentials.Password); !ok {
-	// 	return render(r, w, auth.LoginForm(credentials, auth.LoginErrors{
-	// 		Password: reason,
-	// 	}))
-	// }
 
 	resp, err := sb.Client.Auth.SignIn(r.Context(), credentials)
 	if err != nil {
@@ -112,17 +105,17 @@ func HandleAuthCallback(w http.ResponseWriter, r *http.Request) error {
 
 func HandleLogoutCreate(w http.ResponseWriter, r *http.Request) error {
 	store := sessions.NewCookieStore([]byte(os.Getenv("SESSION_KEY")))
-	session, _ := store.Get(r, "user")
-	session.Values["accessToken"] = "accessToken"
+	session, _ := store.Get(r, sessionUserKey)
+	session.Values[sessionAccessTokenKey] = ""
 	session.Save(r, w)
-	http.SetCookie(w, &cookie)
+
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 	return nil
 }
 
 func setAuthSession(w http.ResponseWriter, r *http.Request, accessToken string) error {
 	store := sessions.NewCookieStore([]byte(os.Getenv("SESSION_KEY")))
-	session, _ := store.Get(r, "user")
-	session.Values["access_token"] = accessToken
+	session, _ := store.Get(r, sessionUserKey)
+	session.Values[sessionAccessTokenKey] = accessToken
 	return session.Save(r, w)
 }
