@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"picturethisai/db"
 	"picturethisai/handler"
 	"picturethisai/pkg/sb"
 
@@ -46,6 +47,10 @@ func main() {
 
 func initAll() error {
 	if err := godotenv.Load(); err != nil {
+		return err
+	}
+
+	if err := db.Init(); err != nil {
 		return err
 	}
 

@@ -21,8 +21,8 @@ up: ## DB migrate up
 down: ## DB migrate down
 	@go run cmd/migrate/main.go down
 
-drop:
-	@go run cmd/drop/main.go up
+reset:
+	@go run cmd/reset/main.go up
 
 migration:
 	@migrate create -ext sql -dir cmd/migrate/migrations $(filter-out $@,$(MAKECMDGOALS))

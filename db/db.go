@@ -6,6 +6,8 @@ import (
 	"os"
 	"strings"
 
+	_ "github.com/golang-migrate/migrate/v4/source/file"
+	_ "github.com/lib/pq"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/extra/bundebug"
@@ -21,7 +23,7 @@ func CreateDatabase(
 ) (*sql.DB, error) {
 	hostArr := strings.Split(dbhost, ":")
 	host := hostArr[0]
-	port := "5432"
+	port := "6543"
 	if len(hostArr) > 1 {
 		port = hostArr[1]
 	}
