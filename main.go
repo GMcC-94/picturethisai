@@ -26,7 +26,7 @@ func main() {
 	router.Use(handler.WithUser)
 
 	// Public Routes
-	router.Handle("/*", http.StripPrefix("/", http.FileServer(http.FS(FS))))
+	router.Handle("/*", public())
 	router.Get("/", handler.Make(handler.HandleHomeIndex))
 	router.Get("/login", handler.Make(handler.HandleLoginIndex))
 	router.Get("/login/provider/google", handler.Make(handler.HandleLoginWithGoogle))

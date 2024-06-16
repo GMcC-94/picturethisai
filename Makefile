@@ -10,8 +10,13 @@ install:
 	@npm install -D tailwindcss
 	@npm install -D daisyui@latest
 
+css:
+	@npx tailwindcss -i view/css/app.css -o public/styles.css --watch
+
+templ:
+	@templ generate --watch --proxy=http://localhost:3000
+
 build:
-	npx tailwindcss -i view/css/app.css -o public/styles.css
 	@templ generate view
 	@go build -o bin/picturethisai main.go
 
