@@ -25,20 +25,25 @@ func main() {
 	router := chi.NewMux()
 	router.Use(handler.WithUser)
 
+	// Public Routes
 	router.Handle("/*", http.StripPrefix("/", http.FileServer(http.FS(FS))))
 	router.Get("/", handler.Make(handler.HandleHomeIndex))
 	router.Get("/login", handler.Make(handler.HandleLoginIndex))
 	router.Get("/login/provider/google", handler.Make(handler.HandleLoginWithGoogle))
 	router.Get("/signup", handler.Make(handler.HandleSignupIndex))
-	router.Post("/logout", handler.Make(handler.HandleLogoutCreate))
-	router.Post("/login", handler.Make(handler.HandleLoginCreate))
-	router.Post("/signup", handler.Make(handler.HandleSignupCreate))
 	router.Get("/auth/callback", handler.Make(handler.HandleAuthCallback))
 	router.Get("/account/setup", handler.Make(handler.HandleAccountSetupIndex))
 
+	router.Post("/logout", handler.Make(handler.HandleLogoutCreate))
+	router.Post("/login", handler.Make(handler.HandleLoginCreate))
+	router.Post("/signup", handler.Make(handler.HandleSignupCreate))
+	router.Post("/account/setup", handler.Make(handler.HandleAccountSetupCreate))
+
+	// Auth routes
 	router.Group(func(auth chi.Router) {
-		auth.Use(handler.WithAuth)
+		auth.Use(handler.WithAccountSetup)
 		auth.Get("/settings", handler.Make(handler.HandleSettingsIndex))
+		auth.Get("/", handler.Make(handler.HandleHomeIndex))
 	})
 
 	port := os.Getenv("HTTP_LISTEN_ADDR")

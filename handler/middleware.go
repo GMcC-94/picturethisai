@@ -2,9 +2,12 @@ package handler
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"log/slog"
 	"net/http"
 	"os"
+	"picturethisai/db"
 	"picturethisai/pkg/sb"
 	"picturethisai/types"
 	"strings"
@@ -62,10 +65,32 @@ func WithAuth(next http.Handler) http.Handler {
 		}
 		user := getAuthenticatedUser(r)
 		if !user.LoggedIn {
-			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			path := r.URL.Path
+			http.Redirect(w, r, "/login?to="+path, http.StatusSeeOther)
 			return
 		}
 		next.ServeHTTP(w, r)
+	}
+	return http.HandlerFunc(fn)
+}
+
+func WithAccountSetup(next http.Handler) http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) {
+		user := getAuthenticatedUser(r)
+		account, err := db.GetAccountByUserID(user.ID)
+		// User has not setup account yet
+		// Redirect to /account/setup
+		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				http.Redirect(w, r, "/account/setup", http.StatusSeeOther)
+				return
+			}
+			next.ServeHTTP(w, r)
+			return
+		}
+		user.Account = account
+		ctx := context.WithValue(r.Context(), types.UserContextKey, user)
+		next.ServeHTTP(w, r.WithContext(ctx))
 	}
 	return http.HandlerFunc(fn)
 }
