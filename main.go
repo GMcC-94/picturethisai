@@ -43,7 +43,7 @@ func main() {
 	router.Group(func(auth chi.Router) {
 		auth.Use(handler.WithAccountSetup)
 		auth.Get("/settings", handler.Make(handler.HandleSettingsIndex))
-		auth.Get("/", handler.Make(handler.HandleHomeIndex))
+		auth.Put("/settings/account/profile", handler.Make(handler.HandleSettingsUsernameUpdate))
 	})
 
 	port := os.Getenv("HTTP_LISTEN_ADDR")

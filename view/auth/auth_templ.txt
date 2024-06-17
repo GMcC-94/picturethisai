@@ -1,0 +1,35 @@
+<div class=\"max-w-xl bg-base-300 px-6 py-12 w-full mx-auto mt-4 rounded\"><h1 class=\"text-xl font-black mb-8 text-center\">Setup your Account</h1>
+</div>
+<form hx-post=\"/account/setup\" hx-swap=\"outerHTML\"><label class=\"form-control w-full max-w-xs\"><div class=\"label\"><span class=\"label-text\">Enter your username</span></div><input class=\"input input-bordered\" type=\"text\" name=\"username\"><div class=\"label\">
+<span class=\"label-text text-error\">
+</span>
+</div></label> <button class=\"btn btn-primary\">Setup Account<i class=\"fa-solid fa-arrow-right\"></i></button></form>
+<div class=\"flex justify-center mt-[calc(100vh-100vh+8rem)]\"><div class=\"max-w-md m w-full bg-base-300 py-10 px-8 rounded-xl\"><h1 class=\"text-center text-xl font-black mb-10\">Login to picturethisai</h1>
+</div></div>
+<form hx-post=\"/login\" hx-swap=\"outerHTML\" class=\"space-y-4\"><div class=\"w-full\"><div class=\"label\"><span class=\"label-text\">Email Address</span></div><input type=\"email\" value=\"
+\" name=\"email\" required autocomplete=\"off\" placeholder=\"Type here\" class=\"input input-bordered w-full\"> 
+<div class=\"label\"><span class=\"label-text-alt text-error\">
+</span></div>
+</div><div class=\"w-full\"><div class=\"label\"><span class=\"label-text\">Password</span></div><input type=\"password\" name=\"password\" required autocomplete=\"off\" placeholder=\"Type here\" class=\"input input-bordered w-full\"> 
+<div class=\"label\"><span class=\"label-text-alt text-error\">
+</span></div>
+</div>
+<div class=\"text-sm text-error\">
+</div>
+<button type=\"submit\" class=\"btn btn-primary w-full\">Login <i class=\"fa-solid fa-arrow-right\"></i></button><div class=\"divider\">OR</div><a href=\"/login/provider/google\" class=\"btn btn-outline w-full\">Login with Google<i class=\"fa-brands fa-google\"></i><i class=\"fa-solid fa-arrow-right\"></i></a></form>
+<div class=\"flex justify-center mt-[calc(100vh-100vh+8rem)]\"><div class=\"max-w-md m w-full bg-base-300 py-10 px-8 rounded-xl\"><h1 class=\"text-center text-xl font-black mb-10\">Signup to picturethisai</h1>
+</div></div>
+<div>A confirmation email has been sent to: <span class=\"font-semibold text-success\">
+</span></div>
+<form hx-post=\"/signup\" hx-swap=\"outerHTML\" class=\"space-y-4\"><div class=\"w-full\"><div class=\"label\"><span class=\"label-text\">Email Address</span></div><input type=\"email\" value=\"
+\" name=\"email\" required autocomplete=\"off\" placeholder=\"Type here\" class=\"input input-bordered w-full\"> 
+<div class=\"label\"><span class=\"label-text-alt text-error\">
+</span></div>
+</div><div class=\"w-full\"><div class=\"label\"><span class=\"label-text\">Password</span></div><input type=\"password\" name=\"password\" required autocomplete=\"off\" class=\"input input-bordered w-full\"> 
+<div class=\"label\"><span class=\"label-text-alt text-error\">
+</span></div>
+</div><div class=\"w-full\"><div class=\"label\"><span class=\"label-text\">Confirm Password</span></div><input type=\"password\" name=\"confirmPassword\" required autocomplete=\"off\" class=\"input input-bordered w-full\"> 
+<div class=\"label\"><span class=\"label-text-alt text-error\">
+</span></div>
+</div><button type=\"submit\" class=\"btn btn-primary w-full\">Signup <i class=\"fa-solid fa-arrow-right\"></i></button></form>
+<script>\n\tvar url = window.location.href\n\tvar newURL = url.replace(\"#\", \"?\")\n\twindow.location = newURL\n\t</script>

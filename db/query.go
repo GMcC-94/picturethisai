@@ -23,3 +23,13 @@ func GetAccountByUserID(userId uuid.UUID) (types.Account, error) {
 		Scan(context.Background())
 	return account, err
 }
+
+func UpdateAccount(account *types.Account) error {
+
+	_, err := Bun.NewUpdate().
+		Model(account).
+		WherePK().
+		Exec(context.Background())
+
+	return err
+}
