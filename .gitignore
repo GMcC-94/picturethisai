@@ -1,4 +1,5 @@
 .env
 bin
 *_templ.go*
+/view/.txt
 tmp

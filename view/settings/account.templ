@@ -5,6 +5,7 @@ import "picturethisai/types"
 
 type ProfileParams struct {
 	Username string
+	Success  bool
 }
 
 type ProfileErrors struct {
@@ -49,7 +50,18 @@ templ ProfileForm(params ProfileParams, errors ProfileErrors) {
 		<div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0 items-center mt-8">
 			<dt class="">Username</dt>
 			<dd class="sm:col-span-2 sm:mt-0">
-				<input class="input input-bordered w-full max-w-sm" value={ params.Username } name="username"/>
+				if params	.Success {
+					<div class="toast toast-top toast-mid">
+						<div class="alert alert-success">
+							<span>Username updated successfully</span>
+						</div>
+					</div>
+				}
+				<input
+					class="input input-bordered w-full max-w-sm"
+					value={ params.Username }
+					name="username"
+				/>
 				if len(errors.Username) > 0 {
 					<div class="text-sm text-error">{ errors.Username }</div>
 				}

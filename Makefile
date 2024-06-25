@@ -17,7 +17,7 @@ templ:
 	@templ generate -watch -proxy=http://localhost:3000
 
 build:
-	@templ generate view
+	@templ generate
 	@go build -o bin/picturethisai main.go
 
 up: ## DB migrate up
