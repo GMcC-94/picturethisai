@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"picturethisai/db"
 	"picturethisai/pkg/kit/validate"
+	"picturethisai/pkg/sb"
 	"picturethisai/view/settings"
 )
 
@@ -33,5 +34,10 @@ func HandleSettingsUsernameUpdate(w http.ResponseWriter, r *http.Request) error 
 	}
 	params.Success = true
 	return render(r, w, settings.ProfileForm(params, settings.ProfileErrors{}))
+}
+
+func HandleSettingsResetPassword(w http.ResponseWriter, r *http.Request) error {
+	user := getAuthenticatedUser(r)
+	return sb.Client.Auth.ResetPasswordForEmail(r.Context(), user.Email)
 
 }
