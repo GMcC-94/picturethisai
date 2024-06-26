@@ -86,6 +86,28 @@ func HandleSignupCreate(w http.ResponseWriter, r *http.Request) error {
 	return render(r, w, auth.SignupSuccess(user.Email))
 }
 
+func HandleResetPasswordIndex(w http.ResponseWriter, r *http.Request) error {
+	return render(r, w, auth.ResetPassword())
+}
+
+func HandleResetPasswordCreate(w http.ResponseWriter, r *http.Request) error {
+	user := getAuthenticatedUser(r)
+	return render(r, w, auth.ResetPasswordSuccess(user.Email))
+
+	// Using supabase is causing errors because of rate limiting
+	// Potential fix is to use email provider? or custom logic to fix this.
+	if err := sb.Client.Auth.ResetPasswordForEmail(r.Context(), user.Email); err != nil {
+		return err
+	}
+	return nil
+	//return render(r, w, auth.ResetPassword())
+}
+
+func HandleResetPasswordUpdate(w http.ResponseWriter, r *http.Request) error {
+	// return render(r, w, auth.ResetPassword())
+	return hxRedirect(w, r, "/")
+}
+
 func HandleLoginWithGoogle(w http.ResponseWriter, r *http.Request) error {
 	resp, err := sb.Client.Auth.SignInWithProvider(supabase.ProviderSignInOptions{
 		Provider:   "google",
