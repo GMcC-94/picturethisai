@@ -3,6 +3,7 @@ package handler
 import (
 	"log/slog"
 	"net/http"
+	"picturethisai/db"
 	"picturethisai/types"
 	"picturethisai/view/generate"
 
@@ -10,8 +11,13 @@ import (
 )
 
 func HandleGenerateIndex(w http.ResponseWriter, r *http.Request) error {
+	user := getAuthenticatedUser(r)
+	images, err := db.GetImagesByUserID(user.ID)
+	if err != nil {
+		return err
+	}
 	data := generate.ViewData{
-		Images: []types.Image{},
+		Images: images,
 	}
 	return render(r, w, generate.Index(data))
 }
