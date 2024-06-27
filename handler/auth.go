@@ -1,6 +1,10 @@
 package handler
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
 	"log/slog"
 	"net/http"
 	"os"
@@ -92,19 +96,58 @@ func HandleResetPasswordIndex(w http.ResponseWriter, r *http.Request) error {
 
 func HandleResetPasswordCreate(w http.ResponseWriter, r *http.Request) error {
 	user := getAuthenticatedUser(r)
-	return render(r, w, auth.ResetPasswordSuccess(user.Email))
+	params := map[string]any{
+		"email":      user.Email,
+		"redirectTo": "http://localhost:300/auth/reset-password",
+	}
+
+	b, err := json.Marshal(params)
+	if err != nil {
+		return err
+	}
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s", sb.BaseAuthURL), bytes.NewReader(b))
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("apikey", os.Getenv("SUPABASE_SECRET"))
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		b, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+		return fmt.Errorf("supabase password recovery responded with a non 220 status: %d => %s", resp.StatusCode, string(b))
+	}
+
+	return render(r, w, auth.ResetPasswordInitiated(user.Email))
 
 	// Using supabase is causing errors because of rate limiting
 	// Potential fix is to use email provider? or custom logic to fix this.
-	if err := sb.Client.Auth.ResetPasswordForEmail(r.Context(), user.Email); err != nil {
-		return err
-	}
-	return nil
+	// if err := sb.Client.Auth.ResetPasswordForEmail(r.Context(), user.Email); err != nil {
+	// return err
+	// }
+	// return nil
 	//return render(r, w, auth.ResetPassword())
 }
 
 func HandleResetPasswordUpdate(w http.ResponseWriter, r *http.Request) error {
-	// return render(r, w, auth.ResetPassword())
+	user := getAuthenticatedUser(r)
+	params := map[string]any{
+		"password": r.FormValue("password"),
+	}
+	_, err := sb.Client.Auth.UpdateUser(r.Context(), user.AccessToken, params)
+	errors := auth.ResetPasswordErrors{
+		NewPassword: "Please enter a valid password",
+	}
+	if err != nil {
+		return render(r, w, auth.ResetPasswordForm(errors))
+	}
+
 	return hxRedirect(w, r, "/")
 }
 
