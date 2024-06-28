@@ -34,6 +34,23 @@ func UpdateAccount(account *types.Account) error {
 	return err
 }
 
+func CreateImage(image *types.Image) error {
+	_, err := Bun.NewInsert().
+		Model(image).
+		Exec(context.Background())
+	return err
+}
+
+func GetImageByID(id int) (types.Image, error) {
+	var image types.Image
+	err := Bun.NewSelect().
+		Model(&image).
+		Where("id = ?", id).
+		Scan(context.Background())
+
+	return image, err
+}
+
 func GetImagesByUserID(userID uuid.UUID) ([]types.Image, error) {
 	var images []types.Image
 	err := Bun.NewSelect().

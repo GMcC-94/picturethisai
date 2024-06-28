@@ -6,6 +6,7 @@ import (
 	"picturethisai/db"
 	"picturethisai/types"
 	"picturethisai/view/generate"
+	"strconv"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -23,15 +24,30 @@ func HandleGenerateIndex(w http.ResponseWriter, r *http.Request) error {
 }
 
 func HandleGenerateCreate(w http.ResponseWriter, r *http.Request) error {
+	user := getAuthenticatedUser(r)
+	prompt := "red sportscar in a garden"
+	img := types.Image{
+		Prompt: prompt,
+		UserID: user.ID,
+		Status: types.ImageStatusPending,
+	}
 
-	return render(r, w, generate.GalleryImage(types.Image{Status: types.ImageStatusPending}))
+	if err := db.CreateImage(&img); err != nil {
+		return err
+	}
+
+	return render(r, w, generate.GalleryImage(img))
 }
 
 func HandleGenerateImageStatus(w http.ResponseWriter, r *http.Request) error {
-	id := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		return err
+	}
 	// Fetch image from DB
-	image := types.Image{
-		Status: types.ImageStatusPending,
+	image, err := db.GetImageByID(id)
+	if err != nil {
+		return err
 	}
 	slog.Info("checking image status:", "id", id)
 	return render(r, w, generate.GalleryImage(image))
