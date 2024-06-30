@@ -1,9 +1,11 @@
 package handler
 
 import (
+	"fmt"
 	"log/slog"
 	"net/http"
 	"picturethisai/db"
+	"picturethisai/pkg/kit/validate"
 	"picturethisai/types"
 	"picturethisai/view/generate"
 	"strconv"
@@ -25,7 +27,23 @@ func HandleGenerateIndex(w http.ResponseWriter, r *http.Request) error {
 
 func HandleGenerateCreate(w http.ResponseWriter, r *http.Request) error {
 	user := getAuthenticatedUser(r)
-	prompt := "red sportscar in a garden"
+	amount, _ := strconv.Atoi(r.FormValue("amount"))
+	params := generate.FormParams{
+		Prompt: r.FormValue("prompt"),
+		Amount: amount,
+	}
+
+	var errors generate.FormErrors
+	ok := validate.New(params, validate.Fields{
+		"Prompt": validate.Rules(validate.Min(10), validate.Max(100)),
+	}).Validate(&errors)
+	if !ok {
+		return render(r, w, generate.Form(params, errors))
+	}
+
+	fmt.Println(params)
+
+	return nil
 	img := types.Image{
 		Prompt: prompt,
 		UserID: user.ID,

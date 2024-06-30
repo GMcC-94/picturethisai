@@ -34,7 +34,7 @@ func main() {
 	tables := []string{
 		"schema_migrations",
 		"accounts",
-		"iamges",
+		"images",
 	}
 
 	for _, table := range tables {

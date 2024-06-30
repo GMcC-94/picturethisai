@@ -14,7 +14,7 @@ css:
 	@npx tailwindcss -i view/css/app.css -o public/styles.css --watch
 
 templ:
-	@templ generate -watch -proxy=http://localhost:3000
+	@templ generate -watch -proxy=localhost:3000
 
 build:
 	@templ generate
