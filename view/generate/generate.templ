@@ -3,6 +3,7 @@ package generate
 import (
 	"picturethisai/view/layout"
 	"picturethisai/types"
+	"picturethisai/view"
 	"fmt"
 )
 
@@ -70,8 +71,7 @@ type FormErrors struct {
 templ Form(params FormParams, errors FormErrors) {
 	<form
 		hx-post="/generate"
-		hx-swap="afterbegin"
-		hx-target="#gallery"
+		hx-swap="outerHTML"
 	>
 		<div>
 			<label class="form-control">
@@ -97,9 +97,18 @@ templ Form(params FormParams, errors FormErrors) {
 				</div>
 				<div class="join">
 					for _, amount := range amounts {
-						<input class="join-item btn" value={ amount } type="radio" name="amount" aria-label={ amount }/>
+						if amount == view.String(params.Amount) {
+							<input class="join-item btn" value={ amount } type="radio" name="amount" aria-label={ amount }/>
+						} else {
+							<input class="join-item btn" value={ amount } type="radio" name="amount" aria-label={ amount }/>
+						}
 					}
 				</div>
+				if len(errors.Amount) > 0 {
+					<div class="label">
+						<span class="label-text text-error">{ errors.Amount }</span>
+					</div>
+				}
 			</label>
 			<button class="btn btn-primary w-full mt-4">Generate</button>
 		</div>

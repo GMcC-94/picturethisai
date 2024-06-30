@@ -1,7 +1,8 @@
 package handler
 
 import (
-	"fmt"
+	"context"
+	"database/sql"
 	"log/slog"
 	"net/http"
 	"picturethisai/db"
@@ -11,6 +12,8 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/google/uuid"
+	"github.com/uptrace/bun"
 )
 
 func HandleGenerateIndex(w http.ResponseWriter, r *http.Request) error {
@@ -34,6 +37,8 @@ func HandleGenerateCreate(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	var errors generate.FormErrors
+
+	// Make valid handle integers
 	ok := validate.New(params, validate.Fields{
 		"Prompt": validate.Rules(validate.Min(10), validate.Max(100)),
 	}).Validate(&errors)
@@ -41,20 +46,33 @@ func HandleGenerateCreate(w http.ResponseWriter, r *http.Request) error {
 		return render(r, w, generate.Form(params, errors))
 	}
 
-	fmt.Println(params)
-
-	return nil
-	img := types.Image{
-		Prompt: prompt,
-		UserID: user.ID,
-		Status: types.ImageStatusPending,
+	if amount <= 0 || amount > 8 {
+		errors.Amount = "Please select a valid number of images"
+		return render(r, w, generate.Form(params, errors))
 	}
 
-	if err := db.CreateImage(&img); err != nil {
+	// If this func returns an err, it's going to rollback.
+	// If there is no err, it's going to commit all the images.
+	err := db.Bun.RunInTx(r.Context(), &sql.TxOptions{}, func(ctx context.Context, tx bun.Tx) error {
+		batchID := uuid.New()
+		for i := 0; i < params.Amount; i++ {
+			img := types.Image{
+				Prompt:  params.Prompt,
+				UserID:  user.ID,
+				Status:  types.ImageStatusPending,
+				BatchID: batchID,
+			}
+			if err := db.CreateImage(&img); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	if err != nil {
 		return err
 	}
 
-	return render(r, w, generate.GalleryImage(img))
+	return hxRedirect(w, r, "/generate")
 }
 
 func HandleGenerateImageStatus(w http.ResponseWriter, r *http.Request) error {
