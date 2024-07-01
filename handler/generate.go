@@ -7,7 +7,6 @@ import (
 	"log"
 	"log/slog"
 	"net/http"
-	"os"
 	"picturethisai/db"
 	"picturethisai/pkg/kit/validate"
 	"picturethisai/types"
@@ -127,7 +126,7 @@ func generateImage(ctx context.Context, params GenerateImageParams) error {
 	}
 
 	webhook := replicate.Webhook{
-		URL:    fmt.Sprintf(os.Getenv("WEBHOOK")+"/%s/%s", params.UserID, params.BatchID),
+		URL:    fmt.Sprintf("https://webhook.site/a6d17d56-f683-4f59-8ee9-7ab6bb75ec14/%s/%s", params.UserID, params.BatchID),
 		Events: []replicate.WebhookEventType{"start", "completed"},
 	}
 

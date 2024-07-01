@@ -57,6 +57,17 @@ func GetImagesByUserID(userID uuid.UUID) ([]types.Image, error) {
 		Model(&images).
 		Where("deleted = ?", false).
 		Where("user_id = ?", userID).
+		Order("created_at desc").
+		Scan(context.Background())
+
+	return images, err
+}
+
+func GetImagesByBatchID(batchID uuid.UUID) ([]types.Image, error) {
+	var images []types.Image
+	err := Bun.NewSelect().
+		Model(&images).
+		Where("batch_id = ?", batchID).
 		Scan(context.Background())
 
 	return images, err
