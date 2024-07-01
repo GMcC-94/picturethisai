@@ -5,6 +5,7 @@ import (
 	"picturethisai/types"
 	"picturethisai/view"
 	"fmt"
+	"picturethisai/view/ui"
 )
 
 type ViewData struct {
@@ -64,8 +65,11 @@ type FormParams struct {
 }
 
 type FormErrors struct {
-	Prompt string
-	Amount string
+	Prompt        string
+	Amount        string
+	CreditsNeeded int
+	UserCredits   int
+	Credits       bool
 }
 
 templ Form(params FormParams, errors FormErrors) {
@@ -113,6 +117,9 @@ templ Form(params FormParams, errors FormErrors) {
 			<button class="btn btn-primary w-full mt-4">Generate</button>
 		</div>
 	</form>
+	if errors.Credits {
+		@ui.CreditsModal(errors.CreditsNeeded, errors.UserCredits)
+	}
 }
 
 var amounts = []string{
