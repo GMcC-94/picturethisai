@@ -3,8 +3,11 @@ package handler
 import (
 	"context"
 	"database/sql"
+	"fmt"
+	"log"
 	"log/slog"
 	"net/http"
+	"os"
 	"picturethisai/db"
 	"picturethisai/pkg/kit/validate"
 	"picturethisai/types"
@@ -13,6 +16,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
+	"github.com/replicate/replicate-go"
 	"github.com/uptrace/bun"
 )
 
@@ -38,7 +42,7 @@ func HandleGenerateCreate(w http.ResponseWriter, r *http.Request) error {
 
 	var errors generate.FormErrors
 
-	// Make valid handle integers
+	// Make validate handle integers
 	ok := validate.New(params, validate.Fields{
 		"Prompt": validate.Rules(validate.Min(10), validate.Max(100)),
 	}).Validate(&errors)
@@ -50,11 +54,20 @@ func HandleGenerateCreate(w http.ResponseWriter, r *http.Request) error {
 		errors.Amount = "Please select a valid number of images"
 		return render(r, w, generate.Form(params, errors))
 	}
+	batchID := uuid.New()
+	genParams := GenerateImageParams{
+		Prompt:  params.Prompt,
+		Amount:  params.Amount,
+		UserID:  user.ID,
+		BatchID: batchID,
+	}
+	if err := generateImage(r.Context(), genParams); err != nil {
+		return err
+	}
 
 	// If this func returns an err, it's going to rollback.
 	// If there is no err, it's going to commit all the images.
 	err := db.Bun.RunInTx(r.Context(), &sql.TxOptions{}, func(ctx context.Context, tx bun.Tx) error {
-		batchID := uuid.New()
 		for i := 0; i < params.Amount; i++ {
 			img := types.Image{
 				Prompt:  params.Prompt,
@@ -87,4 +100,38 @@ func HandleGenerateImageStatus(w http.ResponseWriter, r *http.Request) error {
 	}
 	slog.Info("checking image status:", "id", id)
 	return render(r, w, generate.GalleryImage(image))
+}
+
+type GenerateImageParams struct {
+	Prompt  string
+	Amount  int
+	BatchID uuid.UUID
+	UserID  uuid.UUID
+}
+
+func generateImage(ctx context.Context, params GenerateImageParams) error {
+
+	// You can also provide a token directly with
+	// `replicate.NewClient(replicate.WithToken("r8_..."))`
+	r8, err := replicate.NewClient(replicate.WithTokenFromEnv())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	model := "stability-ai/sdxl"
+	version := "7762fd07cf82c948538e41f63f77d685e02b063e37e496e96eefd46c929f9bdc"
+
+	input := replicate.PredictionInput{
+		"prompt":      params.Prompt,
+		"num_prompts": params.Amount,
+	}
+
+	webhook := replicate.Webhook{
+		URL:    fmt.Sprintf(os.Getenv("WEBHOOK")+"/%s/%s", params.UserID, params.BatchID),
+		Events: []replicate.WebhookEventType{"start", "completed"},
+	}
+
+	// Run a model and wait for its output
+	_, err = r8.Run(ctx, fmt.Sprintf("%s:%s", model, version), input, &webhook)
+	return err
 }

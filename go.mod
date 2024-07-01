@@ -31,6 +31,7 @@ require (
 	github.com/moby/docker-image-spec v1.3.1 // indirect
 	github.com/nedpals/postgrest-go v0.1.3 // indirect
 	github.com/opencontainers/image-spec v1.1.0 // indirect
+	github.com/replicate/replicate-go v0.20.0 // indirect
 	github.com/stretchr/testify v1.9.0 // indirect
 	github.com/tmthrgd/go-hex v0.0.0-20190904060850-447a3041c3bc // indirect
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
@@ -38,5 +39,6 @@ require (
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.52.0 // indirect
 	go.opentelemetry.io/otel/trace v1.27.0 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
+	golang.org/x/sync v0.7.0 // indirect
 	golang.org/x/sys v0.18.0 // indirect
 )
