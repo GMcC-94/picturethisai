@@ -41,6 +41,15 @@ func CreateImage(image *types.Image) error {
 	return err
 }
 
+func UpdateImage(image *types.Image) error {
+	_, err := Bun.NewUpdate().
+		Model(image).
+		WherePK().
+		Exec(context.Background())
+
+	return err
+}
+
 func GetImageByID(id int) (types.Image, error) {
 	var image types.Image
 	err := Bun.NewSelect().
