@@ -1,0 +1,51 @@
+package credits
+
+import "picturethisai/view/layout"
+
+type Pricing struct {
+	Credits   string
+	Price     string
+	ProductID string
+}
+
+var prices = []Pricing{
+	{
+		Credits:   "100",
+		Price:     "9.99",
+		ProductID: "",
+	},
+	{
+		Credits:   "250",
+		Price:     "19.99",
+		ProductID: "",
+	},
+	{
+		Credits:   "550",
+		Price:     "29.99",
+		ProductID: "",
+	},
+	{
+		Credits:   "1000",
+		Price:     "49.99",
+		ProductID: "",
+	},
+}
+
+templ Index() {
+	@layout.App(true) {
+		<div class="w-full max-w-4xl bg-base-300 rounded-xl p-8 mt-12 mx-auto">
+			<div class="flex gap-12 justify-evenly">
+				for _, price := range prices {
+					@PriceCard(price)
+				}
+			</div>
+		</div>
+	}
+}
+
+templ PriceCard(pricing Pricing) {
+	<div class="border border-gray-700 hover:border-secondary px-6 py-4 rounded-lg text-center">
+		<div class="mb-8 text-2xl font-black text-secondary">{ pricing.Credits } Credits</div>
+		<div class="text-xl">£{ pricing.Price }</div>
+	</div>
+}
